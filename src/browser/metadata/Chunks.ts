@@ -1,4 +1,4 @@
-import { File, FileDigest, Util} from '../index'
+import { File, FileDigest, Util} from '../../index.browser'
 
 export class Chunks {
 

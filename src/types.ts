@@ -1,4 +1,4 @@
-import { IPFS } from './index'
+import { IPFS } from './index.node'
 
 class EncryptionSchema {
   constructor(

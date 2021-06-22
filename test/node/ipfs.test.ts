@@ -1,4 +1,4 @@
-import * as SkyeKiwi from '../src/index'
+import * as SkyeKiwi from '../src/index.node'
 import { expect } from 'chai'
 import { randomBytes } from 'tweetnacl'
 

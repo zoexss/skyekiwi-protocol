@@ -1,4 +1,4 @@
-import { Util } from '../index'
+import { Util } from '../../index.node'
 
 export class EncryptionSchema {
   public members: Uint8Array[]

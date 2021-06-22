@@ -1,4 +1,4 @@
-import { EncryptionSchema, TSS, Box, Util } from '../index'
+import { EncryptionSchema, TSS, Box, Util } from '../../index.browser'
 import { randomBytes } from 'tweetnacl'
 import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
 

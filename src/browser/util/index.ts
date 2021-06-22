@@ -1,4 +1,4 @@
-import * as SkyeKiwi from '../index'
+import * as SkyeKiwi from '../../index.browser'
 
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {

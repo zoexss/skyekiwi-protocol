@@ -1,5 +1,5 @@
 import secrets from 'secrets.js-grempe'
-import {Util} from '../index'
+import {Util} from '../../index.browser'
 
 // 32 bytes
 const SKYEKIWI_SECRETS_ENDING = "244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619"
@@ -23,7 +23,7 @@ class TSS {
     // Proceed with TSS
     const shares = secrets.share(wrappedMessageHexString, numShares, threshold)
 
-    // get rid of the BITS field, where they create wrong u8a
+    // get rid of the BITS field, as they create wrong u8a
     // it should be set by default to 8. 
     // I cannot think of a chance if the below error can be thrown, 
     // given the secret.js params is not changes
@@ -34,7 +34,7 @@ class TSS {
       return share.slice(1)
     })
 
-    const shares_u8a = derivedSharing.map(Util.hexToU8a);
+    const shares_u8a = derivedSharing.map(Util.hexToU8a)
     return shares_u8a
   }
 

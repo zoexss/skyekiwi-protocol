@@ -2,7 +2,7 @@ import fs from 'fs'
 import crypto from 'crypto'
 import zlib from 'zlib'
 
-import { Util } from '../index'
+import { Util } from '../../index.browser'
 
 export class File {
 

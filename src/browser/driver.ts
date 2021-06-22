@@ -6,7 +6,7 @@ import {
 
   IPFS,
   SecretBox
-} from './index'
+} from '../index.browser'
 
 class Driver {
 

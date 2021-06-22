@@ -4,7 +4,7 @@ import { Seal } from './Seal'
 import {
   stringToU8a
 } from '@polkadot/util'
-import {Util} from '../index'
+import {Util} from '../../index.browser'
 
 export {
   Chunks, Seal, EncryptionSchema
