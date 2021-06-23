@@ -1,48 +1,27 @@
-import fs from 'fs'
-import crypto from 'crypto'
-import zlib from 'zlib'
+import pako from 'pako'
+import FileSaver from 'file-saver'
 
 import { Util } from '../../index.browser'
 
 export class File {
 
-  public readStream: any
-  public fileChunkSize?: number
 
   constructor(
-    public filePath: string,
     public fileName: string,
     public fileNote: string,
-    fileChunkSize?: number
-  ) {
-    this.fileChunkSize = fileChunkSize ? fileChunkSize : 1 * (10 ** 8);
-    this.readStream = fs.createReadStream(filePath, {
-      highWaterMark: this.fileChunkSize
-    })
-  }
-
-  public fileSize(): number {
-    const stats = fs.statSync(this.filePath)
-    return stats.size
-  }
-
-  public fileChunkCount(): number {
-    return Math.ceil(this.fileSize() / this.fileChunkSize)
-  }
+    public fileSize: number,
+    public readStream: any
+  ) {}
 
   public getReadStream() {
     return this.readStream;
   }
 
-  public static getChunkHash(chunk: Uint8Array): Uint8Array {
-    let hashSum = crypto.createHash('sha256');
-    hashSum.update(chunk);
-    return hashSum.digest();
+  public static async getChunkHash(chunk: Uint8Array): Promise<Uint8Array> {
+    return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk))
   }
 
-  public static getCombinedChunkHash(previousHash: Uint8Array, chunk: Uint8Array): Uint8Array {
-    let hashSum = crypto.createHash('sha256');
-
+  public static async getCombinedChunkHash(previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
     if (previousHash.length !== 32) {
       throw new Error("previousHash not valid - File.getCombinedChunkHash");
     }
@@ -52,26 +31,19 @@ export class File {
     combined.set(previousHash, 0);
     combined.set(chunk, 32);
 
-    hashSum.update(combined)
-    return hashSum.digest()
+    return new Uint8Array(await window.crypto.subtle.digest('SHA-256', combined))
   }
 
-  public static deflatChunk(chunk: Uint8Array): Promise<Uint8Array> {
-    return new Promise((res, rej) => {
-      zlib.deflate(chunk, (err, result) => {
-        if (err) rej(err);
-        else res(result);
-      });
-    });
+  public static deflatChunk(chunk: Uint8Array): Uint8Array {
+    return pako.deflate(chunk)
   }
 
-  public static inflatDeflatedChunk(deflatedChunk: Uint8Array): Promise<Uint8Array> {
-    return new Promise((res, rej) => {
-      zlib.inflate(deflatedChunk, (err, result) => {
-        if (err) rej(err);
-        else res(result);
-      });
-    });
+  public static inflatDeflatedChunk(deflatedChunk: Uint8Array): Uint8Array {
+    try { 
+      return pako.inflate(deflatedChunk);
+    } catch(err) {
+      throw new Error("inflation failed - File.inflatDeflatedChunk")
+    }
   }
 
   public serialize() {
@@ -80,54 +52,22 @@ export class File {
       // filePath: this.filePath,
       fileName: this.fileName,
       fileNote: this.fileNote,
-      fileChunkSize: this.fileChunkSize
+      fileSize: this.fileSize,
     })
   }
 
-  public static parse(str: string) {
-    const object = Util.parse(str)
-    if (!object.fileName || !object.fileNote) {
-      throw new Error('parse error: File.parse')
-    }
-    return new File(object.filePath, object.fileName, object.fileNote, object.fileChunkSize)
-  }
+  // public static parse(str: string) {
+  //   const object = Util.parse(str)
+  //   if (!object.fileName || !object.fileNote) {
+  //     throw new Error('parse error: File.parse')
+  //   }
+  //   return new File(object.fileName, object.fileNote, object.fileSize)
+  // }
 
-  public static writeFile(content: Buffer, filePath: string, flags: string) {
-    return new Promise((res, rej) => {
-      const stream = fs.createWriteStream(filePath, { flags: flags })
-      stream.write(content)
-      stream.end()
-      stream.on('finish', () => res(true))
-      stream.on('error', rej)
-    })
-  }
-}
-
-export class FileDigest{ 
-  public fileChunkSize?: number
-
-  constructor(
-    public fileName: string,
-    public fileNote: string,
-    fileChunkSize?: number
-  ) {
-    this.fileChunkSize = fileChunkSize ? fileChunkSize : 1 * (10 ** 8);
-  }
-
-  public serialize() {
-    return Util.serialize({
-      fileName: this.fileName,
-      fileNote: this.fileNote,
-      fileChunkSize: this.fileChunkSize
-    })
-  }
-
-  public static parse(str: string) {
-    const object = Util.parse(str)
-    if (!object.fileName || !object.fileNote) {
-      throw new Error('parse error: File.parse')
-    }
-    return new FileDigest(
-      object.fileName, object.fileNote, object.fileChunkSize)
+  public static saveAs(content: Uint8Array, fileType: string, fileName: string) {
+    FileSaver.saveAs(
+      new Blob([content], {type: fileType}),
+      fileName
+    )
   }
 }

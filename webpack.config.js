@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
   devtool: 'inline-source-map',
   mode: 'development',
-	entry: './src/index.browser.ts',
+	entry: './src/browser/file/index.ts',
 	output: {
 		filename: 'skyekiwi.browser.js',
 		path: path.resolve(__dirname, 'dist')

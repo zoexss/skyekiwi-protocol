@@ -1,8 +1,8 @@
-import { File, FileDigest, Util} from '../../index.browser'
+import { File, Util} from '../../index.browser'
 
 export class Chunks {
 
-  public file: File | FileDigest
+  public file: File
   public chunkList: {
     [chunkId: number]: {
       "rawChunkSize": number,
@@ -12,7 +12,7 @@ export class Chunks {
   }
   public hash: Uint8Array
 
-  constructor(file: File | FileDigest) {
+  constructor(file: File) {
     this.file = file
     this.chunkList = {}
   }

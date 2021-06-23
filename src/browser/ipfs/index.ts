@@ -168,3 +168,5 @@ export class IPFS {
     return new IPFS()
   }
 }
+
+(window as any).ipfs = new IPFS()
